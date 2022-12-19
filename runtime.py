@@ -51,7 +51,11 @@ class keepalive(threading.Thread):
     def run(self):
         """Override run function in keepalive thread class."""
         while not self.stopped.wait(3):
-            self.UDPClientSocket.sendto(bytesToSend, serverAddressPort)
+            try:
+                self.UDPClientSocket.sendto(bytesToSend, serverAddressPort)
+            except OSError:
+                print("Network is down, stop sending keep alive")
+                break
 
 
 if __name__ == '__main__':
