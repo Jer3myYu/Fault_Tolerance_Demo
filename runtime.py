@@ -42,3 +42,4 @@ if __name__ == '__main__':
     client.connect(broker, port=1883, keepalive=15)
     while run:
         client.loop()
+    print("here")
