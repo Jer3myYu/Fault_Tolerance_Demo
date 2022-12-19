@@ -26,6 +26,7 @@ def on_connect(client, userdata, flags, rc):
 
 def on_disconnect(client, userdata, rc=0):
     """Callback for disconnect from broker."""
+    global run
     print("Disconnected return code " + str(rc))
     run = False
 
