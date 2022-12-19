@@ -88,11 +88,11 @@ class checkalive(threading.Thread):
 
     def run(self):
         """Override run function in checkalive thread class."""
-        while not self.stopped.wait(30):
+        while not self.stopped.wait(15):
             mutex.acquire()
             now = time.time()
-            for runtime in runtime:
-                if now - runtime.time > 60:
+            for runtime in runtimes:
+                if now - runtime['time'] > 30:
                     print("network of {} is dead".format(runtime))
                     runtimes[runtimes]['network'] = "dead"
                     print(runtimes)
@@ -113,10 +113,16 @@ if __name__ == '__main__':
     # Bind to address and ip
     UDPServerSocket.bind((localIP, localPort))
 
-    # Thread sponse the response
+    # Thread sponse the listening to UDP socket
     server = listen(UDPServerSocket)
     server.daemon = True
     server.start()
+
+    # Thread sponce the check alive
+    stopFlag = threading.Event()
+    alive = checkalive(stopFlag)
+    alive.daemon = True
+    alive.start()
 
     client.connect(broker, port=1883, keepalive=60)
     client.subscribe("runtime/lastwill")

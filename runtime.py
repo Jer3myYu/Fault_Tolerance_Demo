@@ -50,7 +50,7 @@ class keepalive(threading.Thread):
 
     def run(self):
         """Override run function in keepalive thread class."""
-        while not self.stopped.wait(10):
+        while not self.stopped.wait(3):
             try:
                 self.UDPClientSocket.sendto(bytesToSend, serverAddressPort)
             except OSError:
@@ -78,7 +78,7 @@ if __name__ == '__main__':
     heart_beat.daemon = True
     heart_beat.start()
 
-    client.connect(broker, port=1883, keepalive=15)
+    client.connect(broker, port=1883, keepalive=10)
     while run:
         client.loop()
     print("Network is down")
