@@ -92,9 +92,11 @@ class checkalive(threading.Thread):
             mutex.acquire()
             now = time.time()
             for runtime in runtimes:
-                if now - runtime['time'] > 30:
+                prev = runtimes[runtime]['time']
+                network = runtimes[runtime]['network']
+                if now - prev > 30 and network != 'dead':
                     print("network of {} is dead".format(runtime))
-                    runtimes[runtimes]['network'] = "dead"
+                    runtimes[runtime]['network'] = 'dead'
                     print(runtimes)
             mutex.release()
 
@@ -125,5 +127,5 @@ if __name__ == '__main__':
     alive.start()
 
     client.connect(broker, port=1883, keepalive=60)
-    client.subscribe("runtime/lastwill")
+    client.subscribe("runtime/keepalive")
     client.loop_forever()
