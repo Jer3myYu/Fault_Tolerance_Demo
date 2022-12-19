@@ -2,6 +2,7 @@
 import paho.mqtt.client as paho
 import threading
 import socket
+import time
 import sys
 
 # MQTT variables
@@ -13,12 +14,18 @@ localPort = 15640
 bufferSize = 1024
 
 # Orchestrator variables
-runtimes = dict()
+runtimes = {}
+# create a lock
+mutex = threading.Lock()
 
 
 def on_message(client, userdata, msg):
     """Callback for receive msg."""
+    global mutex
+    global runtimes
     print(msg.topic + ": " + msg.payload.decode())
+    if "last will" in msg.payload.decode():
+        print("receive last will need more operation")
 
 
 def on_log(client, userdata, level, buf):
@@ -57,8 +64,39 @@ class listen(threading.Thread):
                 clientIP = "Client IP Address:{}".format(address)
                 print(clientMsg)
                 print(clientIP)
+
+                # record current time for checking keepalive
+                mutex.acquire()
+                if address in runtimes:
+                    runtimes[address]['time'] = time.time()
+                else:
+                    runtimes[address] = {
+                        'network': 'isAlive',
+                        'runtime': 'isAlive',
+                        'time': time.time()}
+                mutex.release()
             except Exception as e:
                 print("listening exception: {}".format(e))
+
+
+class checkalive(threading.Thread):
+    """Thread for frequently check alive status of runtimes."""
+
+    def __init__(self, event):
+        threading.Thread.__init__(self)
+        self.stopped = event
+
+    def run(self):
+        """Override run function in checkalive thread class."""
+        while not self.stopped.wait(30):
+            mutex.acquire()
+            now = time.time()
+            for runtime in runtime:
+                if now - runtime.time > 60:
+                    print("network of {} is dead".format(runtime))
+                    runtimes[runtimes]['network'] = "dead"
+                    print(runtimes)
+            mutex.release()
 
 
 if __name__ == '__main__':
@@ -82,8 +120,4 @@ if __name__ == '__main__':
 
     client.connect(broker, port=1883, keepalive=60)
     client.subscribe("runtime/lastwill")
-
-
-
-
-    
+    client.loop_forever()

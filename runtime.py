@@ -50,11 +50,11 @@ class keepalive(threading.Thread):
 
     def run(self):
         """Override run function in keepalive thread class."""
-        while not self.stopped.wait(3):
+        while not self.stopped.wait(10):
             try:
                 self.UDPClientSocket.sendto(bytesToSend, serverAddressPort)
             except OSError:
-                print("Network is down, stop sending keep alive")
+                print("Network is down, stop sending keep")
                 break
 
 
@@ -62,7 +62,7 @@ if __name__ == '__main__':
     # paho client setup
     client = paho.Client()
     client.will_set(
-        "runtime/lastwill", payload="last will message!", qos=0, retain=False)
+        "runtime/keepalive", payload="last will message!", qos=0, retain=False)
     client.on_message = on_message
     client.on_connect = on_connect
     client.on_disconnect = on_disconnect
