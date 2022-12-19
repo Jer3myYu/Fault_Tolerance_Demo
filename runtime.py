@@ -62,7 +62,7 @@ if __name__ == '__main__':
     # paho client setup
     client = paho.Client()
     client.will_set(
-        "runtime/keepalive", payload="last will message!", qos=0, retain=False)
+        "runtime/lastwill", payload="last will message!", qos=0, retain=False)
     client.on_message = on_message
     client.on_connect = on_connect
     client.on_disconnect = on_disconnect
