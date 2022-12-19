@@ -39,6 +39,6 @@ if __name__ == '__main__':
     client.on_disconnect = on_disconnect
     client.on_log = on_log
 
-    client.connect(broker, port=1883, keepalive=60)
+    client.connect(broker, port=1883, keepalive=15)
     while run:
         client.loop()
