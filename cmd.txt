@@ -1,0 +1,1 @@
+/usr/local/sbin/mosquitto -c /Users/jeremy/Desktop/Fault_tolerance_Demo/configTest.conf -p 1884

@@ -2,7 +2,7 @@
 import paho.mqtt.client as paho
 import sys
 
-broker = "192.168.1.154"
+broker = "192.168.1.251"
 run = True
 
 
@@ -24,7 +24,7 @@ def on_connect(client, userdata, flags, rc):
         print("Could not connect to MQTT Broker!")
 
 
-def on_disconnect(client, userdata, flags, rc=0):
+def on_disconnect(client, userdata, rc=0):
     """Callback for disconnect from broker."""
     print("Disconnected return code " + str(rc))
     run = False
